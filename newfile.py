@@ -41,3 +41,4 @@ async def get_response(request: ChatRequest):
     system_instruction = f"Role: {p.ai_role}, Tone: {p.tone}, Depth: {p.depth}"
     model = genai.GenerativeModel("gemini-1.5-flash-latest")
     response = m
+0
