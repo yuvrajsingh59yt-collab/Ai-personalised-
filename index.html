@@ -6,13 +6,13 @@
     <title>AI Assistant</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #121212; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        #chat-container { width: 95%; max-width: 400px; height: 80vh; background: #1e1e1e; border-radius: 15px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        #header { background: #007bff; padding: 15px; text-align: center; font-weight: bold; font-size: 1.1em; }
+        #chat-container { width: 95%; max-width: 400px; height: 85vh; background: #1e1e1e; border-radius: 15px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        #header { background: #007bff; padding: 15px; text-align: center; font-weight: bold; }
         #chat-window { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; }
         .msg { max-width: 85%; padding: 10px 14px; border-radius: 15px; font-size: 14px; line-height: 1.4; word-wrap: break-word; }
         .user-msg { align-self: flex-end; background-color: #007bff; color: white; border-bottom-right-radius: 2px; }
         .ai-msg { align-self: flex-start; background-color: #333; color: #eee; border-bottom-left-radius: 2px; }
-        .error-msg { background-color: #4a1a1a; color: #ff9999; border: 1px solid #ff4444; align-self: center; text-align: center; width: 90%; font-size: 12px; }
+        .error-msg { background-color: #4a1a1a; color: #ff9999; align-self: center; text-align: center; width: 90%; font-size: 12px; }
         .input-area { background: #252525; padding: 15px; display: flex; gap: 10px; }
         input { flex: 1; background: #333; border: 1px solid #444; color: white; padding: 10px 15px; border-radius: 25px; outline: none; }
         button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 25px; cursor: pointer; font-weight: bold; }
@@ -21,9 +21,9 @@
 <body>
 
 <div id="chat-container">
-    <div id="header">Gemini AI Assistant</div>
+    <div id="header">Smart AI Assistant</div>
     <div id="chat-window">
-        <div class="msg ai-msg">System: Using key ...b-qs. Type a message to test!</div>
+        <div class="msg ai-msg">Hello! I'm ready to chat. Ask me anything!</div>
     </div>
     <div class="input-area">
         <input type="text" id="user-input" placeholder="Type a message...">
@@ -32,33 +32,43 @@
 </div>
 
 <script>
-    // Using your existing key
     const API_KEY = "AIzaSyBs-crafcVwaR3j5aG1Bk0vEFOVm_1b-qs"; 
+    
+    // This array stores our chat history so the AI remembers past messages
+    let chatHistory = [];
 
     const chatWindow = document.getElementById('chat-window');
     const userInput = document.getElementById('user-input');
     const sendBtn = document.getElementById('send-btn');
 
-    async function getAIResponse(prompt) {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+    async function getAIResponse(userText) {
+        // Updated to the stable v1/gemini-pro URL
+        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${API_KEY}`;
         
+        // Add user message to history
+        chatHistory.push({ role: "user", parts: [{ text: userText }] });
+
         try {
             const response = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                body: JSON.stringify({ contents: chatHistory })
             });
             
             const data = await response.json();
 
             if (!response.ok) {
-                // If this triggers, we will see the EXACT Google error on screen
-                return { error: true, message: `Google Error ${response.status}: ${data.error ? data.error.message : 'Check API Settings'}` };
+                return { error: true, message: `Error: ${data.error ? data.error.message : 'Check connection'}` };
             }
 
-            return { error: false, message: data.candidates[0].content.parts[0].text };
+            const aiText = data.candidates[0].content.parts[0].text;
+            
+            // Add AI response to history
+            chatHistory.push({ role: "model", parts: [{ text: aiText }] });
+
+            return { error: false, message: aiText };
         } catch (err) {
-            return { error: true, message: "Network Error: Please check your connection." };
+            return { error: true, message: "System: Network connection failed." };
         }
     }
 
