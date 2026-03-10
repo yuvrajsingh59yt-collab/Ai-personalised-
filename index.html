@@ -5,48 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zenith AI</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #121212; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        #chat-container { width: 95%; max-width: 400px; height: 85vh; background: #1e1e1e; border-radius: 15px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        #header { background: #6f42c1; padding: 15px; text-align: center; font-weight: bold; font-size: 1.2em; }
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: radial-gradient(circle at top, #1a1a2e, #0f0f0f); 
+            color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; 
+        }
+        #chat-container { 
+            width: 95%; max-width: 400px; height: 85vh; background: rgba(30, 30, 30, 0.9); 
+            border-radius: 20px; display: flex; flex-direction: column; overflow: hidden; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7); border: 1px solid #444;
+        }
+        #header { background: #6f42c1; padding: 18px; text-align: center; font-weight: bold; font-size: 1.3em; letter-spacing: 2px; }
         #chat-window { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; }
-        .msg { max-width: 85%; padding: 10px 14px; border-radius: 15px; font-size: 14px; line-height: 1.4; word-wrap: break-word; }
-        .user-msg { align-self: flex-end; background-color: #6f42c1; color: white; border-bottom-right-radius: 2px; }
-        .ai-msg { align-self: flex-start; background-color: #333; color: #eee; border-bottom-left-radius: 2px; }
-        .error-msg { background-color: #4a1a1a; color: #ff9999; align-self: center; text-align: center; width: 90%; font-size: 12px; border: 1px solid #ff4444; padding: 10px; border-radius: 10px; }
-        .input-area { background: #252525; padding: 15px; display: flex; gap: 10px; }
-        input { flex: 1; background: #333; border: 1px solid #444; color: white; padding: 10px 15px; border-radius: 25px; outline: none; }
-        button { background: #6f42c1; color: white; border: none; padding: 10px 20px; border-radius: 25px; cursor: pointer; font-weight: bold; }
+        .msg { max-width: 85%; padding: 12px 16px; border-radius: 18px; font-size: 14px; line-height: 1.5; }
+        .user-msg { align-self: flex-end; background: linear-gradient(135deg, #6f42c1, #a180da); color: white; border-bottom-right-radius: 2px; }
+        .ai-msg { align-self: flex-start; background-color: #2a2a2a; color: #eee; border-bottom-left-radius: 2px; border: 1px solid #3d3d3d; }
+        .error-msg { background-color: #4a1a1a; color: #ff9999; align-self: center; text-align: center; width: 90%; font-size: 11px; padding: 8px; border-radius: 10px; border: 1px solid #ff4444; }
+        .input-area { background: #1a1a1a; padding: 15px; display: flex; gap: 10px; border-top: 1px solid #333; }
+        input { flex: 1; background: #252525; border: 1px solid #444; color: white; padding: 12px 18px; border-radius: 30px; outline: none; }
+        button { background: #6f42c1; color: white; border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
-
 <div id="chat-container">
-    <div id="header">Zenith AI</div>
+    <div id="header">ZENITH AI 🎙️</div>
     <div id="chat-window">
-        <div class="msg ai-msg">Welcome! I am Zenith AI. Ask me anything, and I'll keep the conversation going!</div>
+        <div class="msg ai-msg">Voice systems active. I am Zenith AI. How can I assist you today?</div>
     </div>
     <div class="input-area">
-        <input type="text" id="user-input" placeholder="Type a message...">
+        <input type="text" id="user-input" placeholder="Type a message..." autocomplete="off">
         <button id="send-btn">Send</button>
     </div>
 </div>
 
 <script>
     const API_KEY = "AIzaSyBs-crafcVwaR3j5aG1Bk0vEFOVm_1b-qs"; 
-    
     let chatHistory = [
         { role: "user", parts: [{ text: "Your name is Zenith AI. Always end your responses with a follow-up question." }] },
-        { role: "model", parts: [{ text: "Understood! I am Zenith AI. How can I help you today?" }] }
+        { role: "model", parts: [{ text: "Understood. I am Zenith AI. How can I assist you today?" }] }
     ];
 
-    const chatWindow = document.getElementById('chat-window');
-    const userInput = document.getElementById('user-input');
-    const sendBtn = document.getElementById('send-btn');
+    function speak(text) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        window.speechSynthesis.speak(utterance);
+    }
 
     async function getAIResponse(userText) {
-        // CHANGED: version 'v1' and model 'gemini-1.5-flash'
-        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
-        
+        // CORRECTED URL: Stable v1 + gemini-pro
+        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${API_KEY}`;
         chatHistory.push({ role: "user", parts: [{ text: userText }] });
 
         try {
@@ -55,48 +61,42 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ contents: chatHistory })
             });
-            
             const data = await response.json();
-
-            if (!response.ok) {
-                return { error: true, message: `Error: ${data.error ? data.error.message : 'Model not found'}` };
-            }
+            
+            if (!response.ok) return { error: true, message: data.error.message };
 
             const aiText = data.candidates[0].content.parts[0].text;
             chatHistory.push({ role: "model", parts: [{ text: aiText }] });
-
+            
+            speak(aiText); // Triggers voice
             return { error: false, message: aiText };
         } catch (err) {
-            return { error: true, message: "Network error. Check your internet connection." };
+            return { error: true, message: "Network Error. Check your connection." };
         }
     }
 
-    function addMessage(text, type) {
-        const div = document.createElement('div');
-        div.className = `msg ${type}`;
-        div.innerText = text;
-        chatWindow.appendChild(div);
-        chatWindow.scrollTop = chatWindow.scrollHeight;
+    const win = document.getElementById('chat-window');
+    const input = document.getElementById('user-input');
+    const btn = document.getElementById('send-btn');
+
+    function add(txt, type) {
+        const d = document.createElement('div');
+        d.className = `msg ${type}`;
+        d.innerText = txt;
+        win.appendChild(d);
+        win.scrollTop = win.scrollHeight;
     }
 
-    sendBtn.onclick = async () => {
-        const text = userInput.value.trim();
-        if (!text) return;
-
-        addMessage(text, 'user-msg');
-        userInput.value = '';
-
-        const result = await getAIResponse(text);
-        
-        if (result.error) {
-            addMessage(result.message, 'error-msg');
-        } else {
-            addMessage(result.message, 'ai-msg');
-        }
+    btn.onclick = async () => {
+        const val = input.value.trim();
+        if (!val) return;
+        add(val, 'user-msg');
+        input.value = '';
+        const result = await getAIResponse(val);
+        add(result.message, result.error ? 'error-msg' : 'ai-msg');
     };
 
-    userInput.addEventListener("keypress", (e) => { if (e.key === "Enter") sendBtn.click(); });
+    input.addEventListener("keypress", (e) => { if (e.key === "Enter") btn.click(); });
 </script>
-
 </body>
 </html>
