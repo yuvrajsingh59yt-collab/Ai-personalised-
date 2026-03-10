@@ -22,34 +22,23 @@
 <div id="chat-container">
     <div id="header">ZENITH AI 🎙️</div>
     <div id="chat-window">
-        <div class="msg ai-msg">Zenith 3.1 Online. Ready for the next lesson.</div>
+        <div class="msg ai-msg">Zenith 3.1 Online. Ready for your learning journey.</div>
     </div>
     <div class="input-area">
-        <input type="text" id="user-input" placeholder="Ask anything..." autocomplete="off">
+        <input type="text" id="user-input" placeholder="Message Zenith..." autocomplete="off">
         <button class="send-btn" id="send-btn">➔</button>
     </div>
 </div>
 
 <script>
-    // --- 1. CONFIGURATION ---
-    // Your key from the prompt:
+    // --- 2026 CONFIG ---
     const API_KEY = "AIzaSyARlgMWUKoLRQfeudvdO9mhL9KBmUe-P9s"; 
-    
-    // Using the current March 2026 stable workhorse
-    const MODEL = "gemini-3.1-flash-lite-preview"; 
+    // Using the current March 2026 stable model
+    const MODEL = "gemini-3.1-flash-lite"; 
     const URL = `https://generativelanguage.googleapis.com/v1/models/${MODEL}:generateContent?key=${API_KEY}`;
 
     let history = [];
 
-    // Voice Response
-    function speak(text) {
-        window.speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(text);
-        u.pitch = 1.1;
-        window.speechSynthesis.speak(u);
-    }
-
-    // --- 2. ENGINE ---
     async function askAI(message) {
         history.push({ role: "user", parts: [{ text: message }] });
         try {
@@ -58,23 +47,23 @@
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ contents: history })
             });
-
             const data = await response.json();
             
             if (data.candidates && data.candidates[0].content) {
                 const reply = data.candidates[0].content.parts[0].text;
                 history.push({ role: "model", parts: [{ text: reply }] });
-                speak(reply);
+                // Text-to-Speech
+                const u = new SpeechSynthesisUtterance(reply);
+                window.speechSynthesis.speak(u);
                 return reply;
             } else {
-                return "System Message: " + (data.error ? data.error.message : "Model warming up...");
+                return "Notice: " + (data.error ? data.error.message : "API is busy, please wait 30 seconds.");
             }
         } catch (error) {
-            return "Connection error. Check your data connection.";
+            return "Connection error. Check your network.";
         }
     }
 
-    // --- 3. UI ---
     const win = document.getElementById("chat-window");
     const inp = document.getElementById("user-input");
     const btn = document.getElementById("send-btn");
@@ -82,15 +71,11 @@
     async function sendMessage() {
         const text = inp.value.trim();
         if (!text) return;
-
         win.innerHTML += `<div class="msg user-msg">${text}</div>`;
         inp.value = "";
         win.scrollTop = win.scrollHeight;
-
         const aiId = "ai-" + Date.now();
         win.innerHTML += `<div class="msg ai-msg" id="${aiId}">...</div>`;
-        win.scrollTop = win.scrollHeight;
-
         const reply = await askAI(text);
         document.getElementById(aiId).innerText = reply;
         win.scrollTop = win.scrollHeight;
@@ -99,6 +84,5 @@
     btn.onclick = sendMessage;
     inp.onkeypress = (e) => { if (e.key === "Enter") sendMessage(); };
 </script>
-
 </body>
 </html>
