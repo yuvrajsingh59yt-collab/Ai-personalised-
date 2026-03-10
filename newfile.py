@@ -40,9 +40,4 @@ async def get_response(request: ChatRequest):
     p = request.profile
     system_instruction = f"Role: {p.ai_role}, Tone: {p.tone}, Depth: {p.depth}"
     model = genai.GenerativeModel("gemini-1.5-flash-latest")
-    response = model.generate_content(f"{system_instruction}\n\nUser: {request.message}")
-    return {"reply": response.text}
-
-if __name__ == "__main__":
-    print("🚀 API starting on http://0.0.0.0:8080")
-    uvicorn.run(app, host="0.0.0.0", port=8080)
+    response = m
