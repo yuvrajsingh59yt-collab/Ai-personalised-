@@ -3,260 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZENITH SYSTEM 2026</title>
+    <title>Zenith AI</title>
     <style>
-        :root {
-            --neon-blue: #00d2ff;
-            --deep-cyan: #3a7bd5;
-            --glass: rgba(0, 210, 255, 0.05);
-            --dark-bg: #020406;
-        }
-
-        body {
-            background-color: var(--dark-bg);
-            background-image: radial-gradient(circle at center, #0a1622 0%, #020406 100%);
-            color: #fff;
-            font-family: 'Orbitron', 'Segoe UI', sans-serif;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        #hud-container {
-            width: 95%;
-            max-width: 450px;
-            height: 92vh;
-            border: 1px solid rgba(0, 210, 255, 0.2);
-            border-radius: 40px;
-            display: flex;
-            flex-direction: column;
-            backdrop-filter: blur(15px);
-            box-shadow: 0 0 50px rgba(0, 210, 255, 0.1);
-            position: relative;
-            background: rgba(10, 20, 30, 0.4);
-        }
-
-        #header {
-            padding: 20px;
-            text-align: center;
-            font-weight: bold;
-            letter-spacing: 3px;
-            color: var(--neon-blue);
-            text-shadow: 0 0 15px var(--neon-blue);
-            text-transform: uppercase;
-            font-size: 1.2rem;
-        }
-
-        /* Circular Logo Reactor */
-        .logo-container {
-            width: 80px;
-            height: 80px;
-            margin: 10px auto;
-            position: relative;
-            border-radius: 50%;
-            padding: 5px;
-            border: 2px solid var(--neon-blue);
-            box-shadow: 0 0 20px var(--neon-blue);
-            animation: pulse 2.5s infinite ease-in-out;
-        }
-
-        .logo-container img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 0 10px var(--neon-blue); }
-            50% { transform: scale(1.05); box-shadow: 0 0 30px var(--neon-blue); }
-            100% { transform: scale(1); box-shadow: 0 0 10px var(--neon-blue); }
-        }
-
-        #chat-window {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            scrollbar-width: none; /* Hide scrollbar for Firefox */
-        }
-        #chat-window::-webkit-scrollbar { display: none; }
-
-        .msg {
-            max-width: 80%;
-            padding: 14px;
-            border-radius: 20px;
-            font-size: 14px;
-            line-height: 1.6;
-            backdrop-filter: blur(5px);
-        }
-
-        .user-msg {
-            align-self: flex-end;
-            background: rgba(0, 210, 255, 0.15);
-            border: 1px solid rgba(0, 210, 255, 0.4);
-            color: var(--neon-blue);
-            border-bottom-right-radius: 4px;
-        }
-
-        .ai-msg {
-            align-self: flex-start;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #d1d9e0;
-            border-bottom-left-radius: 4px;
-        }
-
-        .input-area {
-            padding: 25px;
-            display: flex;
-            gap: 12px;
-            background: rgba(0, 0, 0, 0.4);
-            border-bottom-left-radius: 40px;
-            border-bottom-right-radius: 40px;
-        }
-
-        input {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(0, 210, 255, 0.3);
-            color: #fff;
-            padding: 14px 20px;
-            border-radius: 30px;
-            outline: none;
-            transition: 0.3s;
-        }
-
-        input:focus {
-            border-color: var(--neon-blue);
-            box-shadow: 0 0 15px rgba(0, 210, 255, 0.2);
-        }
-
-        .btn {
-            background: transparent;
-            border: 1px solid var(--neon-blue);
-            color: var(--neon-blue);
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            transition: 0.3s;
-        }
-
-        .btn:hover {
-            background: var(--neon-blue);
-            color: #000;
-            box-shadow: 0 0 20px var(--neon-blue);
-        }
-
-        #mic-btn.recording {
-            background: #ff3b3b;
-            border-color: #ff3b3b;
-            color: white;
-            animation: record-pulse 1s infinite;
-        }
-
-        @keyframes record-pulse {
-            0% { box-shadow: 0 0 0px #ff3b3b; }
-            50% { box-shadow: 0 0 20px #ff3b3b; }
-            100% { box-shadow: 0 0 0px #ff3b3b; }
-        }
+        body { font-family: sans-serif; background: radial-gradient(circle, #1a1a2e, #0f0f0f); color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        #chat-container { width: 95%; max-width: 400px; height: 85vh; background: rgba(30, 30, 30, 0.9); border-radius: 20px; display: flex; flex-direction: column; overflow: hidden; border: 1px solid #444; }
+        #header { background: #6f42c1; padding: 15px; text-align: center; font-weight: bold; letter-spacing: 2px; }
+        #chat-window { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .msg { max-width: 80%; padding: 10px; border-radius: 15px; font-size: 14px; }
+        .user-msg { align-self: flex-end; background: #6f42c1; }
+        .ai-msg { align-self: flex-start; background: #2a2a2a; border: 1px solid #3d3d3d; }
+        .input-area { background: #1a1a1a; padding: 15px; display: flex; gap: 10px; }
+        input { flex: 1; background: #252525; border: 1px solid #444; color: white; padding: 10px; border-radius: 20px; outline: none; }
+        button { background: #6f42c1; color: white; border: none; padding: 10px; border-radius: 20px; cursor: pointer; }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-
-<div id="hud-container">
-    <div id="header">ZENITH SYSTEM v3.1</div>
-    
-    <div class="logo-container">
-        <img src="1000002903.png" alt="Zenith Core">
-    </div>
-
-    <div id="chat-window">
-        <div class="msg ai-msg">Protocol Initialized. Systems at peak performance. How shall we proceed, Sir?</div>
-    </div>
-
+<div id="chat-container">
+    <div id="header">ZENITH AI 🎙️</div>
+    <div id="chat-window"><div class="msg ai-msg">Voice active. Ready to chat!</div></div>
     <div class="input-area">
-        <button id="mic-btn" class="btn">🎤</button>
-        <input type="text" id="user-input" placeholder="Execute command..." autocomplete="off">
-        <button id="send-btn" class="btn">➔</button>
+        <input type="text" id="user-input" placeholder="Type here...">
+        <button id="send-btn">Send</button>
     </div>
 </div>
-
 <script>
-    const API_KEY = "AIzaSyAgPyRzxqhEkcDO_1hypF_uEV8o3pVzqvo"; 
-    const MODEL = "gemini-3.1-flash-lite-preview"; 
-    const URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
+    const API_KEY = "AIzaSyBs-crafcVwaR3j5aG1Bk0vEFOVm_1b-qs"; 
+    let history = [{role:"user",parts:[{text:"Name: Zenith AI. Always ask a question."}]},{role:"model",parts:[{text:"Hello!"}]}];
 
-    let history = [];
+    function speak(t) { window.speechSynthesis.speak(new SpeechSynthesisUtterance(t)); }
 
-    // --- Voice Logic ---
-    const micBtn = document.getElementById('mic-btn');
-    const inp = document.getElementById('user-input');
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-    if (SpeechRecognition) {
-        const recognition = new SpeechRecognition();
-        micBtn.onclick = () => {
-            recognition.start();
-            micBtn.classList.add('recording');
-        };
-        recognition.onresult = (e) => {
-            inp.value = e.results[0][0].transcript;
-            micBtn.classList.remove('recording');
-            handleSend();
-        };
-        recognition.onerror = () => micBtn.classList.remove('recording');
-    }
-
-    // --- AI Engine ---
-    async function askAI(message) {
-        history.push({ role: "user", parts: [{ text: message }] });
+    async function ask(txt) {
+        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${API_KEY}`;
+        history.push({role:"user",parts:[{text:txt}]});
         try {
-            const response = await fetch(URL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ contents: history })
-            });
-            const data = await response.json();
-            if (data.candidates) {
-                const reply = data.candidates[0].content.parts[0].text;
-                history.push({ role: "model", parts: [{ text: reply }] });
-                // Voice Response
-                window.speechSynthesis.speak(new SpeechSynthesisUtterance(reply));
-                return reply;
-            }
-            return "Critical Error: " + (data.error ? data.error.message : "Sync Failed.");
-        } catch (e) { return "Link Severed. Check Uplink."; }
+            const res = await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:history})});
+            const data = await res.json();
+            const reply = data.candidates[0].content.parts[0].text;
+            history.push({role:"model",parts:[{text:reply}]});
+            speak(reply);
+            return reply;
+        } catch(e) { return "Error connecting."; }
     }
 
-    // --- UI Logic ---
-    const win = document.getElementById("chat-window"), btn = document.getElementById("send-btn");
+    const win = document.getElementById('chat-window');
+    const input = document.getElementById('user-input');
+    const btn = document.getElementById('send-btn');
 
-    async function handleSend() {
-        const val = inp.value.trim(); if (!val) return;
-        win.innerHTML += `<div class="msg user-msg">${val}</div>`;
-        inp.value = ""; win.scrollTop = win.scrollHeight;
-        
-        const aiId = "ai-" + Date.now();
-        win.innerHTML += `<div class="msg ai-msg" id="${aiId}">Processing...</div>`;
-        const reply = await askAI(val);
-        document.getElementById(aiId).innerText = reply;
+    btn.onclick = async () => {
+        const val = input.value.trim();
+        if(!val) return;
+        const d = document.createElement('div'); d.className='msg user-msg'; d.innerText=val; win.appendChild(d);
+        input.value = '';
+        const r = await ask(val);
+        const a = document.createElement('div'); a.className='msg ai-msg'; a.innerText=r; win.appendChild(a);
         win.scrollTop = win.scrollHeight;
-    }
-
-    btn.onclick = handleSend;
-    inp.onkeypress = (e) => { if (e.key === "Enter") handleSend(); };
+    };
 </script>
 </body>
 </html>
