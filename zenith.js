@@ -1,68 +1,73 @@
-const API_KEY="AIzaSyCAD5QYhRqwShEdjtKtrm9QUfkkTtComW8"
+const API_KEY = "AIzaSyBjuxqscWJP6Sz2uVdVi8FBpf-7HF4I3lM";
 
-const url=`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`
+const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
-const chat=document.getElementById("chat")
-const input=document.getElementById("input")
+const chat = document.getElementById("chat");
+const input = document.getElementById("input");
 
-let username="User"
-let interest=""
+let history = [];
 
-function start(){
-
-username=document.getElementById("name").value || "User"
-interest=document.getElementById("interest").value || ""
-
-document.getElementById("setup").style.display="none"
-
-add(`Hello ${username}. Zenith AI online. How may I assist you today?`,"ai")
-
+function add(text, type) {
+    let d = document.createElement("div");
+    d.className = "msg " + type;
+    d.innerText = text;
+    chat.appendChild(d);
+    chat.scrollTop = chat.scrollHeight;
 }
 
-function add(text,type){
+async function send() {
 
-let d=document.createElement("div")
-d.className="msg "+type
-d.innerText=text
+    let text = input.value.trim();
+    if (!text) return;
 
-chat.appendChild(d)
+    add(text, "user");
+    input.value = "";
 
-chat.scrollTop=chat.scrollHeight
+    history.push({
+        role: "user",
+        parts: [{ text: text }]
+    });
 
+    try {
+
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                contents: history
+            })
+        });
+
+        const data = await response.json();
+
+        let reply = "Zenith could not respond.";
+
+        if (data.candidates && data.candidates.length > 0) {
+            reply = data.candidates[0].content.parts[0].text;
+        }
+
+        history.push({
+            role: "model",
+            parts: [{ text: reply }]
+        });
+
+        add(reply, "ai");
+
+    } catch (error) {
+
+        console.error(error);
+
+        add("⚠️ Connection error with AI service.", "ai");
+
+    }
 }
 
-async function send(){
+document.querySelector("button").onclick = send;
 
-let text=input.value
-if(!text) return
-
-add(text,"user")
-
-input.value=""
-
-let prompt=`User name: ${username}
-User interests: ${interest}
-
-Respond professionally like JARVIS.`
-
-let res=await fetch(url,{
-method:"POST",
-headers:{'Content-Type':'application/json'},
-body:JSON.stringify({
-contents:[
-{role:"user",parts:[{text:prompt+"\n"+text}]}
-]
-})
-})
-
-let data=await res.json()
-
-let reply="Zenith encountered an error."
-
-if(data.candidates && data.candidates.length>0){
-reply=data.candidates[0].content.parts[0].text
-}
-
-add(reply,"ai")
-
-}
+input.addEventListener("keypress", function(e) {
+    if (e.key === "Enter") {
+        send();
+    }
+});
