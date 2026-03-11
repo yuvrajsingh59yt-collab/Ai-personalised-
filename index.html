@@ -1,15 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Zenith AI</title>
 
 <style>
 
 body{
-font-family:Arial, sans-serif;
-background: radial-gradient(circle,#1a1a2e,#0f0f0f);
+background:#0a0a0f;
+font-family:Arial;
 color:white;
 display:flex;
 justify-content:center;
@@ -18,30 +17,33 @@ height:100vh;
 margin:0;
 }
 
-#chat-container{
-width:95%;
-max-width:420px;
+#app{
+width:420px;
 height:90vh;
-background:rgba(20,20,20,0.95);
+background:#111;
 border-radius:20px;
 display:flex;
 flex-direction:column;
-overflow:hidden;
-border:1px solid #444;
+border:1px solid #333;
+box-shadow:0 0 20px #6f42c155;
 }
 
-#header{
+header{
 background:#6f42c1;
-padding:16px;
+padding:15px;
 text-align:center;
 font-weight:bold;
 letter-spacing:2px;
-font-size:18px;
 }
 
-#chat-window{
+#status{
+font-size:12px;
+opacity:0.8;
+}
+
+#chat{
 flex:1;
-overflow-y:auto;
+overflow:auto;
 padding:15px;
 display:flex;
 flex-direction:column;
@@ -49,62 +51,55 @@ gap:10px;
 }
 
 .msg{
+padding:10px;
+border-radius:15px;
 max-width:80%;
-padding:12px;
-border-radius:16px;
-font-size:14px;
 animation:fade .3s ease;
 }
 
 @keyframes fade{
 from{opacity:0; transform:translateY(5px);}
-to{opacity:1; transform:translateY(0);}
+to{opacity:1;}
 }
 
-.user-msg{
+.user{
 align-self:flex-end;
 background:#6f42c1;
 }
 
-.ai-msg{
+.ai{
 align-self:flex-start;
-background:#2a2a2a;
-border:1px solid #3d3d3d;
+background:#222;
 }
 
 .typing{
 font-style:italic;
-opacity:0.7;
+opacity:0.6;
 }
 
-.input-area{
-background:#111;
-padding:12px;
+footer{
 display:flex;
-gap:8px;
+padding:10px;
+gap:10px;
+background:#0f0f0f;
 }
 
 input{
 flex:1;
-background:#252525;
-border:1px solid #444;
-color:white;
 padding:10px;
 border-radius:20px;
-outline:none;
+border:none;
+background:#222;
+color:white;
 }
 
 button{
-background:#6f42c1;
 border:none;
+background:#6f42c1;
 color:white;
-padding:10px 12px;
+padding:10px;
 border-radius:20px;
 cursor:pointer;
-}
-
-button:hover{
-background:#7e56d8;
 }
 
 </style>
@@ -112,17 +107,20 @@ background:#7e56d8;
 
 <body>
 
-<div id="chat-container">
+<div id="app">
 
-<div id="header">ZENITH AI 🤖</div>
+<header>
+ZENITH AI
+<div id="status">System Online</div>
+</header>
 
-<div id="chat-window"></div>
+<div id="chat"></div>
 
-<div class="input-area">
-<input id="user-input" placeholder="Ask Zenith...">
-<button id="send-btn">Send</button>
-<button id="voice-btn">🎤</button>
-</div>
+<footer>
+<input id="input" placeholder="Ask Zenith...">
+<button id="send">Send</button>
+<button id="voice">🎤</button>
+</footer>
 
 </div>
 
@@ -132,38 +130,100 @@ const API_KEY="AIzaSyCA4Ibz9vs0riovEgcRyEcvb5ZtvzRi6jg";
 
 const url=`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${API_KEY}`;
 
-let history=JSON.parse(localStorage.getItem("zenithMemory"))||[
-{role:"user",parts:[{text:"Your name is Zenith AI. Be friendly and ask questions."}]}
-];
+const chat=document.getElementById("chat");
+const input=document.getElementById("input");
 
-const win=document.getElementById("chat-window");
-const input=document.getElementById("user-input");
+let history=JSON.parse(localStorage.getItem("zenith"))||[];
 
-function saveMemory(){
-localStorage.setItem("zenithMemory",JSON.stringify(history));
+function save(){
+localStorage.setItem("zenith",JSON.stringify(history));
 }
 
-function speak(text){
-const u=new SpeechSynthesisUtterance(text);
-speechSynthesis.speak(u);
-}
+function add(text,type){
 
-function addMsg(text,type){
-const d=document.createElement("div");
-d.className=`msg ${type}`;
+let d=document.createElement("div");
+d.className="msg "+type;
 d.innerText=text;
-win.appendChild(d);
-win.scrollTop=win.scrollHeight;
+
+chat.appendChild(d);
+
+chat.scrollTop=chat.scrollHeight;
+
 }
 
 function typing(){
-const t=document.createElement("div");
-t.className="msg ai-msg typing";
+
+let t=document.createElement("div");
+t.className="msg ai typing";
 t.id="typing";
-t.innerText="Zenith is typing...";
-win.appendChild(t);
-win.scrollTop=win.scrollHeight;
+t.innerText="Zenith processing...";
+
+chat.appendChild(t);
+
 }
 
 function removeTyping(){
-const t=document.getElementBy
+
+let t=document.getElementById("typing");
+
+if(t) t.remove();
+
+}
+
+async function ask(text){
+
+history.push({role:"user",parts:[{text:text}]});
+
+typing();
+
+let res=await fetch(url,{
+method:"POST",
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify({contents:history})
+});
+
+let data=await res.json();
+
+removeTyping();
+
+let reply=data.candidates[0].content.parts[0].text;
+
+history.push({role:"model",parts:[{text:reply}]});
+
+save();
+
+add(reply,"ai");
+
+speechSynthesis.speak(new SpeechSynthesisUtterance(reply));
+
+}
+
+document.getElementById("send").onclick=()=>{
+
+let t=input.value;
+
+if(!t) return;
+
+add(t,"user");
+
+input.value="";
+
+ask(t);
+
+}
+
+const rec=new(window.SpeechRecognition||webkitSpeechRecognition)();
+
+rec.onresult=e=>{
+input.value=e.results[0][0].transcript;
+document.getElementById("send").click();
+};
+
+document.getElementById("voice").onclick=()=>{
+rec.start();
+}
+
+</script>
+
+</body>
+</html>
