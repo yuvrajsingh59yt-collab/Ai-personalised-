@@ -1,228 +1,124 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Zenith AI</title>
-
-<style>
-
-body{
-background:#0a0a0f;
-font-family:Arial;
-color:white;
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
-margin:0;
-}
-
-#app{
-width:420px;
-height:90vh;
-background:#111;
-border-radius:20px;
-display:flex;
-flex-direction:column;
-border:1px solid #333;
-box-shadow:0 0 20px #6f42c155;
-}
-
-header{
-background:#6f42c1;
-padding:15px;
-text-align:center;
-font-weight:bold;
-letter-spacing:2px;
-}
-
-#status{
-font-size:12px;
-opacity:0.8;
-}
-
-#chat{
-flex:1;
-overflow:auto;
-padding:15px;
-display:flex;
-flex-direction:column;
-gap:10px;
-}
-
-.msg{
-padding:10px;
-border-radius:15px;
-max-width:80%;
-animation:fade .3s ease;
-}
-
-@keyframes fade{
-from{opacity:0; transform:translateY(5px);}
-to{opacity:1;}
-}
-
-.user{
-align-self:flex-end;
-background:#6f42c1;
-}
-
-.ai{
-align-self:flex-start;
-background:#222;
-}
-
-.typing{
-font-style:italic;
-opacity:0.6;
-}
-
-footer{
-display:flex;
-padding:10px;
-gap:10px;
-background:#0f0f0f;
-}
-
-input{
-flex:1;
-padding:10px;
-border-radius:20px;
-border:none;
-background:#222;
-color:white;
-}
-
-button{
-border:none;
-background:#6f42c1;
-color:white;
-padding:10px;
-border-radius:20px;
-cursor:pointer;
-}
-
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zenith AI | Gemini v1beta</title>
+    <style>
+        :root { --primary: #6f42c1; --bg: #0a0a0f; --panel: #111; --text: #eee; }
+        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        #app { width: 100%; max-width: 500px; height: 90vh; background: var(--panel); border-radius: 20px; display: flex; flex-direction: column; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow: hidden; }
+        header { background: var(--primary); padding: 15px; text-align: center; font-weight: bold; letter-spacing: 2px; }
+        #chat-box { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .msg { padding: 12px 16px; border-radius: 15px; max-width: 85%; font-size: 14px; line-height: 1.5; }
+        .user { align-self: flex-end; background: var(--primary); color: white; border-bottom-right-radius: 2px; }
+        .ai { align-self: flex-start; background: #222; border: 1px solid #444; border-bottom-left-radius: 2px; }
+        footer { padding: 15px; background: #0f0f0f; display: flex; gap: 10px; align-items: center; border-top: 1px solid #333; }
+        input { flex: 1; padding: 12px; border-radius: 25px; border: none; background: #222; color: white; outline: none; }
+        button { background: var(--primary); border: none; color: white; padding: 10px 20px; border-radius: 25px; cursor: pointer; font-weight: bold; }
+        #preview { max-height: 100px; display: none; margin: 10px; border-radius: 10px; }
+    </style>
 </head>
-
 <body>
 
 <div id="app">
-
-<header>
-ZENITH AI
-<div id="status">System Online</div>
-</header>
-
-<div id="chat"></div>
-
-<footer>
-<input id="input" placeholder="Ask Zenith...">
-<button id="send">Send</button>
-<button id="voice">🎤</button>
-</footer>
-
+    <header>ZENITH AI <div style="font-size: 10px; opacity: 0.7;">GEMINI 2.0 FLASH</div></header>
+    <div id="chat-box"></div>
+    <img id="preview" src="" alt="Image preview">
+    <footer>
+        <label style="cursor:pointer; font-size: 20px;">🖼️
+            <input type="file" id="file-input" hidden accept="image/*">
+        </label>
+        <input type="text" id="user-input" placeholder="Type a message...">
+        <button id="send-btn">Send</button>
+    </footer>
 </div>
 
-<script>
+<script type="importmap">
+    { "imports": { "@google/generative-ai": "https://esm.run/@google/generative-ai" } }
+</script>
 
-const API_KEY="AIzaSyCA4Ibz9vs0riovEgcRyEcvb5ZtvzRi6jg";
+<script type="module">
+    import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const url=`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${API_KEY}`;
+    const API_KEY = "AIzaSyCA4Ibz9vs0riovEgcRyEcvb5ZtvzRi6jg"; // ⚠️ Get yours at aistudio.google.com
+    const genAI = new GoogleGenerativeAI(API_KEY);
+    const model = genAI.getGenerativeModel({ 
+        model: "gemini-2.0-flash",
+        systemInstruction: "You are Zenith AI, a helpful and witty assistant. Use markdown for formatting."
+    });
 
-const chat=document.getElementById("chat");
-const input=document.getElementById("input");
+    // Persistent Chat Session (Memory)
+    let chat = model.startChat({ history: [] });
 
-let history=JSON.parse(localStorage.getItem("zenith"))||[];
+    const chatBox = document.getElementById('chat-box');
+    const userInput = document.getElementById('user-input');
+    const fileInput = document.getElementById('file-input');
+    const preview = document.getElementById('preview');
 
-function save(){
-localStorage.setItem("zenith",JSON.stringify(history));
-}
+    // Handle Image Preview
+    fileInput.onchange = () => {
+        const file = fileInput.files[0];
+        if (file) {
+            preview.src = URL.createObjectURL(file);
+            preview.style.display = 'block';
+        }
+    };
 
-function add(text,type){
+    async function sendMessage() {
+        const text = userInput.value;
+        const file = fileInput.files[0];
+        if (!text && !file) return;
 
-let d=document.createElement("div");
-d.className="msg "+type;
-d.innerText=text;
+        // UI: Append User Message
+        appendMessage('user', text);
+        userInput.value = '';
+        preview.style.display = 'none';
 
-chat.appendChild(d);
+        // UI: Prepare AI response container
+        const aiMsgDiv = appendMessage('ai', '...');
 
-chat.scrollTop=chat.scrollHeight;
+        try {
+            let result;
+            if (file) {
+                // Multimodal: Image + Text
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = async () => {
+                    const base64Data = reader.result.split(',')[1];
+                    const promptParts = [
+                        { inlineData: { data: base64Data, mimeType: file.type } },
+                        text || "What is in this image?"
+                    ];
+                    const result = await model.generateContent(promptParts);
+                    aiMsgDiv.innerHTML = result.response.text();
+                };
+            } else {
+                // Chat Memory Mode (Streamed for 10x speed feel)
+                const result = await chat.sendMessageStream(text);
+                aiMsgDiv.innerHTML = '';
+                for await (const chunk of result.stream) {
+                    aiMsgDiv.innerHTML += chunk.text();
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                }
+            }
+        } catch (err) {
+            aiMsgDiv.innerHTML = "Error: " + err.message;
+        }
+        fileInput.value = '';
+    }
 
-}
+    function appendMessage(role, text) {
+        const msg = document.createElement('div');
+        msg.className = `msg ${role}`;
+        msg.innerHTML = text;
+        chatBox.appendChild(msg);
+        chatBox.scrollTop = chatBox.scrollHeight;
+        return msg;
+    }
 
-function typing(){
-
-let t=document.createElement("div");
-t.className="msg ai typing";
-t.id="typing";
-t.innerText="Zenith processing...";
-
-chat.appendChild(t);
-
-}
-
-function removeTyping(){
-
-let t=document.getElementById("typing");
-
-if(t) t.remove();
-
-}
-
-async function ask(text){
-
-history.push({role:"user",parts:[{text:text}]});
-
-typing();
-
-let res=await fetch(url,{
-method:"POST",
-headers:{'Content-Type':'application/json'},
-body:JSON.stringify({contents:history})
-});
-
-let data=await res.json();
-
-removeTyping();
-
-let reply=data.candidates[0].content.parts[0].text;
-
-history.push({role:"model",parts:[{text:reply}]});
-
-save();
-
-add(reply,"ai");
-
-speechSynthesis.speak(new SpeechSynthesisUtterance(reply));
-
-}
-
-document.getElementById("send").onclick=()=>{
-
-let t=input.value;
-
-if(!t) return;
-
-add(t,"user");
-
-input.value="";
-
-ask(t);
-
-}
-
-const rec=new(window.SpeechRecognition||webkitSpeechRecognition)();
-
-rec.onresult=e=>{
-input.value=e.results[0][0].transcript;
-document.getElementById("send").click();
-};
-
-document.getElementById("voice").onclick=()=>{
-rec.start();
-}
-
+    document.getElementById('send-btn').onclick = sendMessage;
+    userInput.onkeypress = (e) => { if(e.key === 'Enter') sendMessage(); };
 </script>
 
 </body>
