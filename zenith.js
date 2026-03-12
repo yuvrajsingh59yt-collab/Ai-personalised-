@@ -1,73 +1,84 @@
-const API_URL="https://your-vercel-app.vercel.app/api/ai"
+const API_URL = "https://your-project-name.vercel.app/api/ai"
 
-const chat=document.getElementById("chat")
-const input=document.getElementById("input")
+const chat = document.getElementById("chat")
+const input = document.getElementById("input")
 
-let username=""
-let interest=""
-let purpose=""
+let username = ""
+let interest = ""
+let purpose = ""
 
 function start(){
 
-username=document.getElementById("name").value
-interest=document.getElementById("interest").value
-purpose=document.getElementById("purpose").value
+username = document.getElementById("name").value || "User"
+interest = document.getElementById("interest").value || ""
+purpose = document.getElementById("purpose").value || ""
 
-document.getElementById("setup").style.display="none"
+document.getElementById("setup").style.display = "none"
 
-add(`Hello ${username}. Zenith AI online.`,"ai")
+add(`Hello ${username}. Zenith AI online. How may I assist you today?`, "ai")
 
 }
 
 function add(text,type){
 
-let d=document.createElement("div")
-d.className="msg "+type
-d.innerText=text
+let msg = document.createElement("div")
+msg.className = "msg " + type
+msg.innerText = text
 
-chat.appendChild(d)
-chat.scrollTop=chat.scrollHeight
+chat.appendChild(msg)
+chat.scrollTop = chat.scrollHeight
 
 }
 
 async function send(){
 
-let text=input.value
+let text = input.value.trim()
 if(!text) return
 
 add(text,"user")
-input.value=""
+input.value = ""
 
-let prompt=`
+let prompt = `
 User name: ${username}
 User interests: ${interest}
 Purpose: ${purpose}
 
-You are Zenith AI like JARVIS.
-Respond professionally.
+You are Zenith AI, an intelligent assistant like JARVIS.
+Respond professionally and helpfully.
 `
 
-let res=await fetch(API_URL,{
+try{
+
+let res = await fetch(API_URL,{
 method:"POST",
 headers:{'Content-Type':'application/json'},
 body:JSON.stringify({
-prompt:prompt+"\n"+text
+prompt: prompt + "\n" + text
 })
 })
 
-let data=await res.json()
+let data = await res.json()
 
-add(data.reply,"ai")
+let reply = data.reply || "Zenith encountered an error."
 
-speak(data.reply)
+add(reply,"ai")
+
+speak(reply)
+
+}catch(e){
+
+add("Connection error with AI server.","ai")
+
+}
 
 }
 
 function speak(text){
 
-let speech=new SpeechSynthesisUtterance(text)
-speech.rate=1
-speech.pitch=1
+let speech = new SpeechSynthesisUtterance(text)
+
+speech.rate = 1
+speech.pitch = 1
 
 speechSynthesis.speak(speech)
 
@@ -75,16 +86,10 @@ speechSynthesis.speak(speech)
 
 function voice(){
 
-let rec=new webkitSpeechRecognition()
-rec.lang="en-IN"
+let recognition = new webkitSpeechRecognition()
 
-rec.onresult=function(e){
+recognition.lang = "en-IN"
 
-input.value=e.results[0][0].transcript
-send()
+recognition.onresult = function(e){
 
-}
-
-rec.start()
-
-}
+input.value = e.results
