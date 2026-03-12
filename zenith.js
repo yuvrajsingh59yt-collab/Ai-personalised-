@@ -1,88 +1,90 @@
-const API_KEY = "AIzaSyBR5v1USUziTT4RehbPKOBcELDtzyCiGvU";
+const API_URL="https://your-vercel-app.vercel.app/api/ai"
 
-const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+const chat=document.getElementById("chat")
+const input=document.getElementById("input")
 
-const chat = document.getElementById("chat");
-const input = document.getElementById("input");
+let username=""
+let interest=""
+let purpose=""
 
-let username = "User";
-let interest = "";
+function start(){
 
-function start() {
+username=document.getElementById("name").value
+interest=document.getElementById("interest").value
+purpose=document.getElementById("purpose").value
 
-username = document.getElementById("name").value || "User";
-interest = document.getElementById("interest").value || "";
+document.getElementById("setup").style.display="none"
 
-document.getElementById("setup").style.display = "none";
-
-add(`Hello ${username}. Zenith AI online. How may I assist you today?`, "ai");
-
-}
-
-function add(text, type) {
-
-let d = document.createElement("div");
-
-d.className = "msg " + type;
-
-d.innerText = text;
-
-chat.appendChild(d);
-
-chat.scrollTop = chat.scrollHeight;
+add(`Hello ${username}. Zenith AI online.`,"ai")
 
 }
 
-async function send() {
+function add(text,type){
 
-let text = input.value.trim();
+let d=document.createElement("div")
+d.className="msg "+type
+d.innerText=text
 
-if (!text) return;
+chat.appendChild(d)
+chat.scrollTop=chat.scrollHeight
 
-add(text, "user");
+}
 
-input.value = "";
+async function send(){
 
-let prompt = `User name: ${username}
+let text=input.value
+if(!text) return
+
+add(text,"user")
+input.value=""
+
+let prompt=`
+User name: ${username}
 User interests: ${interest}
+Purpose: ${purpose}
 
-You are Zenith AI, a professional personal assistant similar to JARVIS. Respond clearly and helpfully.`;
+You are Zenith AI like JARVIS.
+Respond professionally.
+`
 
-try {
-
-let res = await fetch(url, {
-method: "POST",
-headers: {
-"Content-Type": "application/json"
-},
-body: JSON.stringify({
-contents: [
-{
-role: "user",
-parts: [{ text: prompt + "\n" + text }]
-}
-]
+let res=await fetch(API_URL,{
+method:"POST",
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify({
+prompt:prompt+"\n"+text
 })
-});
+})
 
-let data = await res.json();
+let data=await res.json()
 
-let reply = "Zenith encountered an error.";
+add(data.reply,"ai")
 
-if (data.candidates && data.candidates.length > 0) {
-reply = data.candidates[0].content.parts[0].text;
-}
-
-add(reply, "ai");
-
-} catch (error) {
-
-add("⚠️ Connection error with AI.", "ai");
+speak(data.reply)
 
 }
 
+function speak(text){
+
+let speech=new SpeechSynthesisUtterance(text)
+speech.rate=1
+speech.pitch=1
+
+speechSynthesis.speak(speech)
+
 }
 
-input.addEventListener("keypress", function(e) {
-if (e.key === "Enter") send();
-});
+function voice(){
+
+let rec=new webkitSpeechRecognition()
+rec.lang="en-IN"
+
+rec.onresult=function(e){
+
+input.value=e.results[0][0].transcript
+send()
+
+}
+
+rec.start()
+
+}
