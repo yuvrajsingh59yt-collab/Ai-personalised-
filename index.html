@@ -1,182 +1,325 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Zenith AI</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zenith AI | Personality Architect</title>
+    <style>
+        :root {
+            /* Iron Man inspired Colors */
+            --primary: #f1c40f; /* Gold */
+            --secondary: #e74c3c; /* Red */
+            --arc-core: #fff;
+            --arc-glow: rgba(52, 152, 219, 0.8); /* Stark Blue */
+            --bg-panel: rgba(17, 17, 17, 0.9);
+        }
 
-<style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* 🌌 RED AND BLUE BACKGROUND GRADIENT */
+            background: linear-gradient(135deg, #1a0f3c 0%, #6d1b1b 100%);
+            color: white;
+            overflow: hidden;
+        }
 
-body{
-background:#040a10;
-color:white;
-font-family:Arial;
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
-margin:0;
-}
+        /* 🛡️ MAIN CONTAINER */
+        #app {
+            width: 450px;
+            height: 85vh;
+            background: var(--bg-panel);
+            border-radius: 20px;
+            border: 2px solid #333;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
 
-#container{
-width:380px;
-height:90vh;
-background:#0b1118;
-border-radius:20px;
-display:flex;
-flex-direction:column;
-overflow:hidden;
-box-shadow:0 0 40px #00d9ff55;
-}
+        header {
+            background: rgba(111, 66, 193, 0.3);
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            letter-spacing: 2px;
+            border-bottom: 1px solid #444;
+        }
 
-#header{
-text-align:center;
-padding:12px;
-letter-spacing:3px;
-background:#07121a;
-}
+        /* 🌀 ARC REACTOR CONTAINER */
+        #arc-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
 
-#orb{
-width:100px;
-height:100px;
-border-radius:50%;
-margin:auto;
+        /* 🌀 THE ARC REACTOR */
+        #arc-reactor {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: var(--arc-core);
+            position: relative;
+            /* Initial faint glow */
+            box-shadow: 
+                0 0 10px rgba(255, 255, 255, 0.5),
+                0 0 20px var(--arc-glow),
+                0 0 30px var(--arc-glow);
+            transition: box-shadow 0.3s ease;
+        }
 
-background:
-radial-gradient(circle,#ffffff 5%,#00d4ff 30%,#0077ff 60%,transparent 70%);
+        /* The Internal "Uni-Beam" Ring */
+        #arc-reactor::after {
+            content: '';
+            position: absolute;
+            top: 10px; left: 10px; right: 10px; bottom: 10px;
+            border-radius: 50%;
+            border: 4px solid #aaa;
+            background: transparent;
+        }
 
-box-shadow:
-0 0 20px #00d4ff,
-0 0 60px #00d4ff,
-0 0 120px #00d4ff;
+        /* 🔥 GLOWING EFFECT WHEN ACTIVE */
+        #arc-reactor.active {
+            animation: reactor-pulse 1s infinite alternate;
+        }
 
-animation:pulse 2s infinite;
-}
+        @keyframes reactor-pulse {
+            0% {
+                box-shadow: 
+                    0 0 15px rgba(255, 255, 255, 0.8),
+                    0 0 30px var(--arc-glow),
+                    0 0 50px var(--arc-glow),
+                    0 0 70px #3498db;
+            }
+            100% {
+                box-shadow: 
+                    0 0 25px rgba(255, 255, 255, 1),
+                    0 0 50px #fff,
+                    0 0 80px #3498db,
+                    0 0 120px #3498db;
+            }
+        }
 
-@keyframes pulse{
-0%{transform:scale(1)}
-50%{transform:scale(1.15)}
-100%{transform:scale(1)}
-}
+        /* 💬 QUIZ / FEEDBACK PANEL */
+        #quiz-panel {
+            padding: 20px;
+            background: #0f0f0f;
+            border-top: 1px solid #333;
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
 
-#wave{
-height:6px;
-width:120px;
-background:#00d4ff;
-margin:auto;
-border-radius:20px;
-animation:wave 1s infinite;
-}
+        #question-text {
+            font-size: 16px;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
 
-@keyframes wave{
-0%{transform:scaleX(0.3)}
-50%{transform:scaleX(1)}
-100%{transform:scaleX(0.3)}
-}
+        #feedback-text {
+            font-size: 14px;
+            color: #aaa;
+            font-style: italic;
+            display: none; /* Hidden during quiz */
+            margin-bottom: 15px;
+        }
 
-#chat{
-flex:1;
-overflow:auto;
-padding:10px;
-display:flex;
-flex-direction:column;
-}
+        .option-btn {
+            background: #222;
+            color: white;
+            border: 1px solid #444;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
 
-.msg{
-padding:8px 12px;
-margin:6px;
-border-radius:12px;
-max-width:75%;
-}
+        .option-btn:hover {
+            background: var(--primary);
+            color: black;
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
 
-.user{
-background:#0077ff;
-align-self:flex-end;
-}
-
-.ai{
-background:#1b2229;
-}
-
-#inputArea{
-display:flex;
-padding:10px;
-gap:6px;
-}
-
-input{
-flex:1;
-padding:8px;
-border-radius:10px;
-border:none;
-background:#111;
-color:white;
-}
-
-button{
-background:#00c8ff;
-border:none;
-padding:8px 12px;
-border-radius:10px;
-cursor:pointer;
-}
-
-#setup{
-position:absolute;
-background:#040a10;
-width:100%;
-height:100%;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-gap:10px;
-}
-
-</style>
+        #reset-btn {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            display: none; /* Hidden during quiz */
+        }
+    </style>
 </head>
-
 <body>
 
-<div id="setup">
+<div id="app">
+    <header>ZENITH AI</header>
+    
+    <div id="arc-container">
+        <div id="arc-reactor"></div>
+    </div>
 
-<h2>Zenith AI Setup</h2>
-
-<input id="name" placeholder="Your name">
-
-<input id="interest" placeholder="Your interests">
-
-<select id="purpose">
-<option>Study</option>
-<option>Coding</option>
-<option>Productivity</option>
-<option>General AI</option>
-</select>
-
-<button onclick="start()">Start Zenith</button>
-
+    <div id="quiz-panel">
+        <div id="question-text">Initializing Personality Scan...</div>
+        <div id="feedback-text"></div>
+        <div id="options-container">
+            </div>
+        <button id="reset-btn" onclick="startQuiz()">Restart Scan</button>
+    </div>
 </div>
 
-<div id="container">
+<script>
+    // 🧠 THE QUIZ DATA
+    const questions = [
+        {
+            text: "Question 1: You have a free weekend. What’s the plan?",
+            options: [
+                { text: "Building a new gadget or coding a project.", type: "Analyst" },
+                { text: "Hanging out with a big group of friends.", type: "Diplomat" },
+                { text: "Organizing your room or planning next week.", type: "Sentinel" },
+                { text: "Exploring a new place without a map.", type: "Explorer" }
+            ]
+        },
+        {
+            text: "Question 2: When facing a tough problem, you usually...",
+            options: [
+                { text: "Look for logical patterns and data.", type: "Analyst" },
+                { text: "Ask others how it affects them.", type: "Diplomat" },
+                { text: "Follow established rules or procedures.", type: "Sentinel" },
+                { text: "Try a creative, practical solution.", type: "Explorer" }
+            ]
+        },
+        {
+            text: "Question 3: Your ideal role in a team is...",
+            options: [
+                { text: "The Strategist/Architect.", type: "Analyst" },
+                { text: "The Mediator/Motivator.", type: "Diplomat" },
+                { text: "The Administrator/Organizer.", type: "Sentinel" },
+                { text: "The Troubleshooter/Improviser.", type: "Explorer" }
+            ]
+        }
+    ];
 
-<div id="header">ZENITH AI</div>
+    // 🏆 PERSONALITY FEEDBACK PROFILES
+    const personalities = {
+        Analyst: {
+            title: "The Visionary Analyst",
+            feedback: "Systems online. Scan complete. You possess a sharp, logical mind, much like the core of this reactor. You thrive on complexity and innovation. Personalized Feedback: Focus on applying your strategic thinking to real-world challenges, but remember that intuition also has value."
+        },
+        Diplomat: {
+            title: "The Empathetic Diplomat",
+            feedback: "Scan complete. Your energy radiates warmth and connection. You prioritize harmony and understanding people. Personalized Feedback: Your ability to motivate others is a superpower. Use it to build strong teams, but ensure you don't sacrifice your own needs for the group."
+        },
+        Sentinel: {
+            title: "The Detail-Oriented Sentinel",
+            feedback: "Scan complete. You are the structural integrity of any project. Practical, reliable, and organized. Personalized Feedback: Your stability is crucial. Leverage your planning skills for long-term goals, but try to embrace a little spontaneity—it won't break the system."
+        },
+        Explorer: {
+            title: "The Spontaneous Explorer",
+            feedback: "Scan complete. Your energy is dynamic and adaptable. You love action, tools, and mastering new skills. Personalized Feedback: You are a natural troubleshooter. Use your practical creativity to fix things fast, but don't forget to look at the 'big picture' once in a while."
+        }
+    };
 
-<div id="orb"></div>
-<div id="wave"></div>
+    let currentQuestionIndex = 0;
+    let scores = { Analyst: 0, Diplomat: 0, Sentinel: 0, Explorer: 0 };
 
-<div id="chat"></div>
+    const arcReactor = document.getElementById('arc-reactor');
+    const questionText = document.getElementById('question-text');
+    const feedbackText = document.getElementById('feedback-text');
+    const optionsContainer = document.getElementById('options-container');
+    const resetBtn = document.getElementById('reset-btn');
 
-<div id="inputArea">
+    // 🏁 START THE QUIZ
+    function startQuiz() {
+        currentQuestionIndex = 0;
+        scores = { Analyst: 0, Diplomat: 0, Sentinel: 0, Explorer: 0 };
+        feedbackText.style.display = 'none';
+        resetBtn.style.display = 'none';
+        optionsContainer.style.display = 'block';
+        arcReactor.classList.remove('active'); // Start with basic glow
+        showQuestion();
+    }
 
-<input id="input" placeholder="Ask Zenith...">
+    // 💬 DISPLAY A QUESTION
+    function showQuestion() {
+        const currentQuestion = questions[currentQuestionIndex];
+        questionText.innerText = currentQuestion.text;
+        optionsContainer.innerHTML = ''; // Clear previous options
 
-<button onclick="send()">Send</button>
+        // 🔥 ACTIVATE THE ARC REACTOR GLOW (Question asked)
+        arcReactor.classList.add('active');
 
-<button onclick="voice()">🎤</button>
+        currentQuestion.options.forEach(option => {
+            const button = document.createElement('button');
+            button.className = 'option-btn';
+            button.innerText = option.text;
+            button.onclick = () => handleAnswer(option.type);
+            optionsContainer.appendChild(button);
+        });
+    }
 
-</div>
+    // ✅ HANDLE AN ANSWER
+    function handleAnswer(type) {
+        scores[type]++;
+        currentQuestionIndex++;
 
-</div>
+        // 🛑 STOP THE GLOW (Answer received)
+        arcReactor.classList.remove('active');
 
-<script src="zenith.js"></script>
+        if (currentQuestionIndex < questions.length) {
+            // Small delay before next question for effect
+            questionText.innerText = "Analyzing response...";
+            optionsContainer.innerHTML = '';
+            setTimeout(showQuestion, 800);
+        } else {
+            showResults();
+        }
+    }
+
+    // 🏆 SHOW PERSONALIZED FEEDBACK
+    function showResults() {
+        // Find the personality type with the highest score
+        let maxScore = -1;
+        let finalPersonality = '';
+
+        for (const type in scores) {
+            if (scores[type] > maxScore) {
+                maxScore = scores[type];
+                finalPersonality = type;
+            }
+        }
+
+        // Display results
+        const profile = personalities[finalPersonality];
+        questionText.innerText = profile.title;
+        feedbackText.innerText = profile.feedback;
+        feedbackText.style.display = 'block';
+        optionsContainer.style.display = 'none';
+        resetBtn.style.display = 'inline-block';
+
+        // Set Arc Reactor to a solid, stable 'complete' state
+        arcReactor.style.background = '#fff';
+        arcReactor.style.boxShadow = '0 0 30px #fff, 0 0 60px var(--arc-glow)';
+    }
+
+    // Run the quiz on page load
+    startQuiz();
+
+</script>
 
 </body>
 </html>
