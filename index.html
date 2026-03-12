@@ -3,323 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zenith AI | Personality Architect</title>
+    <title>Zenith AI | Integrated Core</title>
     <style>
         :root {
-            /* Iron Man inspired Colors */
-            --primary: #f1c40f; /* Gold */
-            --secondary: #e74c3c; /* Red */
-            --arc-core: #fff;
-            --arc-glow: rgba(52, 152, 219, 0.8); /* Stark Blue */
-            --bg-panel: rgba(17, 17, 17, 0.9);
+            --glow-blue: #3498db;
+            --stark-red: #e74c3c;
         }
 
         body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            /* 🌌 RED AND BLUE BACKGROUND GRADIENT */
-            background: linear-gradient(135deg, #1a0f3c 0%, #6d1b1b 100%);
-            color: white;
-            overflow: hidden;
-        }
-
-        /* 🛡️ MAIN CONTAINER */
-        #app {
-            width: 450px;
-            height: 85vh;
-            background: var(--bg-panel);
-            border-radius: 20px;
-            border: 2px solid #333;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            position: relative;
-        }
-
-        header {
-            background: rgba(111, 66, 193, 0.3);
-            padding: 15px;
-            text-align: center;
-            font-weight: bold;
-            letter-spacing: 2px;
-            border-bottom: 1px solid #444;
-        }
-
-        /* 🌀 ARC REACTOR CONTAINER */
-        #arc-container {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
+            margin: 0; height: 100vh; display: flex; flex-direction: column; align-items: center;
+            background: radial-gradient(circle at center, #1a1a2e 0%, #0f0c29 50%, #000 100%);
+            /* 🌌 RED AND BLUE GLOW EFFECTS */
+            border-left: 5px solid var(--stark-red);
+            border-right: 5px solid var(--glow-blue);
+            color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden;
         }
 
         /* 🌀 THE ARC REACTOR */
+        #arc-container { flex: 1; display: flex; justify-content: center; align-items: center; }
         #arc-reactor {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: var(--arc-core);
-            position: relative;
-            /* Initial faint glow */
-            box-shadow: 
-                0 0 10px rgba(255, 255, 255, 0.5),
-                0 0 20px var(--arc-glow),
-                0 0 30px var(--arc-glow);
-            transition: box-shadow 0.3s ease;
+            width: 140px; height: 140px; border-radius: 50%;
+            background: radial-gradient(circle, #fff 20%, var(--glow-blue) 60%, transparent 100%);
+            box-shadow: 0 0 25px var(--glow-blue), inset 0 0 15px #fff;
+            transition: 0.4s ease; position: relative;
         }
-
-        /* The Internal "Uni-Beam" Ring */
-        #arc-reactor::after {
-            content: '';
-            position: absolute;
-            top: 10px; left: 10px; right: 10px; bottom: 10px;
-            border-radius: 50%;
-            border: 4px solid #aaa;
-            background: transparent;
-        }
-
-        /* 🔥 GLOWING EFFECT WHEN ACTIVE */
         #arc-reactor.active {
-            animation: reactor-pulse 1s infinite alternate;
+            animation: pulse 0.8s infinite alternate;
+            box-shadow: 0 0 80px var(--glow-blue), 0 0 120px #fff;
+        }
+        @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.15); } }
+
+        /* 💬 CHAT PANEL */
+        #chat-panel { 
+            width: 90%; max-width: 550px; background: rgba(0, 0, 0, 0.85); 
+            padding: 25px; border-radius: 30px 30px 0 0; border: 1px solid #333;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+        }
+        
+        #output { 
+            height: 120px; overflow-y: auto; font-size: 15px; 
+            line-height: 1.6; color: #00d4ff; margin-bottom: 15px;
+            font-family: 'Courier New', Courier, monospace;
         }
 
-        @keyframes reactor-pulse {
-            0% {
-                box-shadow: 
-                    0 0 15px rgba(255, 255, 255, 0.8),
-                    0 0 30px var(--arc-glow),
-                    0 0 50px var(--arc-glow),
-                    0 0 70px #3498db;
-            }
-            100% {
-                box-shadow: 
-                    0 0 25px rgba(255, 255, 255, 1),
-                    0 0 50px #fff,
-                    0 0 80px #3498db,
-                    0 0 120px #3498db;
-            }
+        .input-area { display: flex; gap: 12px; }
+        input { 
+            flex: 1; padding: 15px; border-radius: 25px; border: 1px solid #444; 
+            background: #111; color: white; outline: none;
         }
-
-        /* 💬 QUIZ / FEEDBACK PANEL */
-        #quiz-panel {
-            padding: 20px;
-            background: #0f0f0f;
-            border-top: 1px solid #333;
-            min-height: 150px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
+        button { 
+            background: linear-gradient(to right, var(--glow-blue), #2980b9);
+            border: none; color: white; padding: 0 25px; border-radius: 25px; 
+            cursor: pointer; font-weight: bold; transition: 0.3s;
         }
-
-        #question-text {
-            font-size: 16px;
-            margin-bottom: 15px;
-            font-weight: 500;
-        }
-
-        #feedback-text {
-            font-size: 14px;
-            color: #aaa;
-            font-style: italic;
-            display: none; /* Hidden during quiz */
-            margin-bottom: 15px;
-        }
-
-        .option-btn {
-            background: #222;
-            color: white;
-            border: 1px solid #444;
-            padding: 10px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            margin: 5px;
-            transition: all 0.2s ease;
-            font-size: 14px;
-        }
-
-        .option-btn:hover {
-            background: var(--primary);
-            color: black;
-            border-color: var(--primary);
-            transform: translateY(-2px);
-        }
-
-        #reset-btn {
-            background: var(--secondary);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            display: none; /* Hidden during quiz */
-        }
+        button:hover { transform: scale(1.05); filter: brightness(1.2); }
     </style>
 </head>
 <body>
 
-<div id="app">
-    <header>ZENITH AI</header>
-    
+    <h1 style="margin-top:30px; letter-spacing:5px; font-weight: 300; color: var(--glow-blue);">ZENITH AI</h1>
+
     <div id="arc-container">
         <div id="arc-reactor"></div>
     </div>
 
-    <div id="quiz-panel">
-        <div id="question-text">Initializing Personality Scan...</div>
-        <div id="feedback-text"></div>
-        <div id="options-container">
-            </div>
-        <button id="reset-btn" onclick="startQuiz()">Restart Scan</button>
+    <div id="chat-panel">
+        <div id="output">SYSTEM STANDBY... READY FOR INPUT.</div>
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="Command Zenith AI...">
+            <button onclick="processRequest()">SEND</button>
+        </div>
     </div>
-</div>
 
-<script>
-    // 🧠 THE QUIZ DATA
-    const questions = [
-        {
-            text: "Question 1: You have a free weekend. What’s the plan?",
-            options: [
-                { text: "Building a new gadget or coding a project.", type: "Analyst" },
-                { text: "Hanging out with a big group of friends.", type: "Diplomat" },
-                { text: "Organizing your room or planning next week.", type: "Sentinel" },
-                { text: "Exploring a new place without a map.", type: "Explorer" }
-            ]
-        },
-        {
-            text: "Question 2: When facing a tough problem, you usually...",
-            options: [
-                { text: "Look for logical patterns and data.", type: "Analyst" },
-                { text: "Ask others how it affects them.", type: "Diplomat" },
-                { text: "Follow established rules or procedures.", type: "Sentinel" },
-                { text: "Try a creative, practical solution.", type: "Explorer" }
-            ]
-        },
-        {
-            text: "Question 3: Your ideal role in a team is...",
-            options: [
-                { text: "The Strategist/Architect.", type: "Analyst" },
-                { text: "The Mediator/Motivator.", type: "Diplomat" },
-                { text: "The Administrator/Organizer.", type: "Sentinel" },
-                { text: "The Troubleshooter/Improviser.", type: "Explorer" }
-            ]
+    <script>
+        // 🎙️ VOICE CONFIGURATION
+        function speak(text) {
+            const speech = new SpeechSynthesisUtterance(text);
+            const voices = window.speechSynthesis.getVoices();
+            
+            // Search for a deep/manly voice (usually named Google UK English Male or similar)
+            speech.voice = voices.find(v => v.name.includes('Male') || v.name.includes('Google UK English')) || voices[0];
+            speech.pitch = 0.8; // Lower pitch for a "Manly" feel
+            speech.rate = 0.9;  // Slightly slower for authority
+            window.speechSynthesis.speak(speech);
         }
-    ];
 
-    // 🏆 PERSONALITY FEEDBACK PROFILES
-    const personalities = {
-        Analyst: {
-            title: "The Visionary Analyst",
-            feedback: "Systems online. Scan complete. You possess a sharp, logical mind, much like the core of this reactor. You thrive on complexity and innovation. Personalized Feedback: Focus on applying your strategic thinking to real-world challenges, but remember that intuition also has value."
-        },
-        Diplomat: {
-            title: "The Empathetic Diplomat",
-            feedback: "Scan complete. Your energy radiates warmth and connection. You prioritize harmony and understanding people. Personalized Feedback: Your ability to motivate others is a superpower. Use it to build strong teams, but ensure you don't sacrifice your own needs for the group."
-        },
-        Sentinel: {
-            title: "The Detail-Oriented Sentinel",
-            feedback: "Scan complete. You are the structural integrity of any project. Practical, reliable, and organized. Personalized Feedback: Your stability is crucial. Leverage your planning skills for long-term goals, but try to embrace a little spontaneity—it won't break the system."
-        },
-        Explorer: {
-            title: "The Spontaneous Explorer",
-            feedback: "Scan complete. Your energy is dynamic and adaptable. You love action, tools, and mastering new skills. Personalized Feedback: You are a natural troubleshooter. Use your practical creativity to fix things fast, but don't forget to look at the 'big picture' once in a while."
+        // ⌨️ TYPING ANIMATION
+        function typeWriter(text, elementId) {
+            let i = 0;
+            const element = document.getElementById(elementId);
+            element.innerHTML = ""; 
+            
+            function type() {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, 30); // Speed of typing
+                }
+            }
+            type();
         }
-    };
 
-    let currentQuestionIndex = 0;
-    let scores = { Analyst: 0, Diplomat: 0, Sentinel: 0, Explorer: 0 };
+        async function processRequest() {
+            const input = document.getElementById('userInput');
+            const output = document.getElementById('output');
+            const reactor = document.getElementById('arc-reactor');
+            const prompt = input.value;
+            if(!prompt) return;
 
-    const arcReactor = document.getElementById('arc-reactor');
-    const questionText = document.getElementById('question-text');
-    const feedbackText = document.getElementById('feedback-text');
-    const optionsContainer = document.getElementById('options-container');
-    const resetBtn = document.getElementById('reset-btn');
+            // 🌀 POWER UP ARC REACTOR
+            reactor.classList.add('active');
+            output.innerHTML = "ANALYZING...";
+            input.value = '';
 
-    // 🏁 START THE QUIZ
-    function startQuiz() {
-        currentQuestionIndex = 0;
-        scores = { Analyst: 0, Diplomat: 0, Sentinel: 0, Explorer: 0 };
-        feedbackText.style.display = 'none';
-        resetBtn.style.display = 'none';
-        optionsContainer.style.display = 'block';
-        arcReactor.classList.remove('active'); // Start with basic glow
-        showQuestion();
-    }
+            try {
+                // Replace this URL with your actual Vercel link!
+                const response = await fetch('/api/chat', { 
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: prompt })
+                });
+                
+                const data = await response.json();
+                const reply = data.reply || "Systems disrupted. Check connection.";
 
-    // 💬 DISPLAY A QUESTION
-    function showQuestion() {
-        const currentQuestion = questions[currentQuestionIndex];
-        questionText.innerText = currentQuestion.text;
-        optionsContainer.innerHTML = ''; // Clear previous options
+                // ⌨️ Typing Effect
+                typeWriter(reply, "output");
+                // 🎙️ Voice Output
+                speak(reply);
 
-        // 🔥 ACTIVATE THE ARC REACTOR GLOW (Question asked)
-        arcReactor.classList.add('active');
-
-        currentQuestion.options.forEach(option => {
-            const button = document.createElement('button');
-            button.className = 'option-btn';
-            button.innerText = option.text;
-            button.onclick = () => handleAnswer(option.type);
-            optionsContainer.appendChild(button);
-        });
-    }
-
-    // ✅ HANDLE AN ANSWER
-    function handleAnswer(type) {
-        scores[type]++;
-        currentQuestionIndex++;
-
-        // 🛑 STOP THE GLOW (Answer received)
-        arcReactor.classList.remove('active');
-
-        if (currentQuestionIndex < questions.length) {
-            // Small delay before next question for effect
-            questionText.innerText = "Analyzing response...";
-            optionsContainer.innerHTML = '';
-            setTimeout(showQuestion, 800);
-        } else {
-            showResults();
-        }
-    }
-
-    // 🏆 SHOW PERSONALIZED FEEDBACK
-    function showResults() {
-        // Find the personality type with the highest score
-        let maxScore = -1;
-        let finalPersonality = '';
-
-        for (const type in scores) {
-            if (scores[type] > maxScore) {
-                maxScore = scores[type];
-                finalPersonality = type;
+            } catch (err) {
+                output.innerHTML = "CORE ERROR: CONNECTION FAILED.";
+            } finally {
+                // Keep glowing for a moment after finish
+                setTimeout(() => reactor.classList.remove('active'), 1000);
             }
         }
 
-        // Display results
-        const profile = personalities[finalPersonality];
-        questionText.innerText = profile.title;
-        feedbackText.innerText = profile.feedback;
-        feedbackText.style.display = 'block';
-        optionsContainer.style.display = 'none';
-        resetBtn.style.display = 'inline-block';
-
-        // Set Arc Reactor to a solid, stable 'complete' state
-        arcReactor.style.background = '#fff';
-        arcReactor.style.boxShadow = '0 0 30px #fff, 0 0 60px var(--arc-glow)';
-    }
-
-    // Run the quiz on page load
-    startQuiz();
-
-</script>
-
+        // Initial voice load
+        window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.getVoices(); };
+    </script>
 </body>
 </html>
